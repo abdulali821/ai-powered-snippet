@@ -9,7 +9,6 @@ import LivePreview from './LivePreview';
 import LoadingSteps from './LoadingSteps';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiCopy, FiCode, FiEye, FiEdit2 } from 'react-icons/fi';
-import toast from 'react-hot-toast';
 
 interface CodeResponse {
   code: string;
