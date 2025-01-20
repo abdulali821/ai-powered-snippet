@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
-import Image from "next/image";
 import AiPrompt from '@/components/AiPrompt';
 import { motion } from 'framer-motion';
 import { FiCode, FiZap, FiLayout, FiSmartphone } from 'react-icons/fi';
@@ -141,7 +139,7 @@ export default function Home() {
           animate="visible"
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16"
         >
-          {features.map((feature, index) => (
+          {features.map((feature) => (
             <motion.div
               key={feature.title}
               variants={itemVariants}
