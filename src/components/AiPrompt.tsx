@@ -22,6 +22,7 @@ export default function AiPrompt() {
   const [prompt, setPrompt] = useState('');
   const [response, setResponse] = useState<CodeResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [editedCode, setEditedCode] = useState('');
   const [copied, setCopied] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
@@ -37,7 +38,10 @@ export default function AiPrompt() {
   }, [response]);
 
   const handleSubmit = async () => {
-    if (!prompt.trim()) return;
+    if (!prompt.trim()) {
+      setError('Please enter a prompt');
+      return;
+    }
 
     // Check for framework-specific keywords
     const frameworkKeywords = ['react', 'vue', 'angular', 'svelte', 'component', 'jsx', 'tsx'];
@@ -46,10 +50,11 @@ export default function AiPrompt() {
     );
 
     if (hasFrameworkKeywords) {
-      toast.error('This tool only generates vanilla HTML, CSS, and JavaScript code. Framework-specific code generation is not supported.');
+      setError('This tool only generates vanilla HTML, CSS, and JavaScript code. Framework-specific code generation is not supported.');
       return;
     }
 
+    setError(null);
     setLoading(true);
     try {
       const res = await fetch('/api/generate', {
@@ -59,13 +64,11 @@ export default function AiPrompt() {
         },
         body: JSON.stringify({ prompt }),
       });
-
-      if (!res.ok) throw new Error('Failed to generate code');
-
       const data = await res.json();
       setResponse(data);
     } catch (error) {
       console.error('Error:', error);
+      setError('Failed to generate code. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -94,13 +97,17 @@ export default function AiPrompt() {
           <div className="relative">
             <motion.textarea
               value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
+              onChange={(e) => {
+                setPrompt(e.target.value);
+                setError(null);
+              }}
               placeholder="Describe the code you want to generate... (e.g., 'Create a responsive navigation bar with a logo and mobile menu')"
               className="w-full p-4 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[120px] sm:min-h-[100px] resize-none text-sm sm:text-base"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             />
+            
             <motion.button
               type="button"
               onClick={handleSubmit}
@@ -129,7 +136,15 @@ export default function AiPrompt() {
             </motion.button>
           </div>
         </motion.form>
-
+        {error && (
+              <motion.p
+                initial={{ opacity: 0, y: 0 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-red-500 text-sm mt-2"
+              >
+                {error}
+              </motion.p>
+            )}
         <AnimatePresence>
           {loading && (
             <motion.div
