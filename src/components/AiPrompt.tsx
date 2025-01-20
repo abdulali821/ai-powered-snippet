@@ -82,7 +82,7 @@ export default function AiPrompt() {
   if (!mounted) return null;
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6">
+    <div className="w-full max-w-4xl mx-auto">
       <div className="flex flex-col space-y-4">
         <motion.form
           initial={{ opacity: 0, y: 20 }}
@@ -105,7 +105,7 @@ export default function AiPrompt() {
               type="button"
               onClick={handleSubmit}
               disabled={loading || !prompt.trim()}
-              className={`absolute bottom-2 sm:bottom-4 right-2 sm:right-4 px-4 sm:px-6 py-1.5 sm:py-2 rounded-lg font-medium text-white text-sm sm:text-base
+              className={`absolute bottom-4 sm:bottom-4 right-2 sm:right-2 px-4 sm:px-6 py-1.5 sm:py-2 rounded-lg font-medium text-white text-sm sm:text-base
                 ${loading || !prompt.trim() 
                   ? 'bg-gray-400 cursor-not-allowed' 
                   : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'}
