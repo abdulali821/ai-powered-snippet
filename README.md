@@ -25,7 +25,7 @@ A modern web application that generates code snippets using AI technology. Built
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/ai-powered-snippet.git
+git clone https://github.com/abdulali821/ai-powered-snippet.git
 cd ai-powered-snippet
 ```
 
