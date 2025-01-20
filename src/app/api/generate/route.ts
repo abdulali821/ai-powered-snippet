@@ -66,62 +66,51 @@ export async function POST(request: Request) {
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
-    const enhancedPrompt = `Create a modern and professional ${isLanding ? 'landing page' : 'component'} using Tailwind CSS. The design should include the following elements and features:
+    const enhancedPrompt = `Generate clean, modern ${isLanding ? 'landing page' : 'component'} code using only vanilla HTML, CSS (with Tailwind classes), and JavaScript. 
 
-1. **Design Elements**:
-   - A visually appealing hero section with a clear headline and a call-to-action (CTA) button.
-   - A feature grid with hover effects and icons.
-   - A social proof section with testimonials or client logos.
-   - (Optional) Pricing tables for comparison if applicable.
-   - A statistics/achievements section to highlight key metrics.
-   - (Optional) A team section with hover cards for each team member.
-   - A contact form with modern validation and accessibility features.
-   - A footer with quick links, social media icons, and a copyright notice.
+Key Requirements:
+1. Use semantic HTML5 tags
+2. Include responsive Tailwind classes
+3. Add minimal, necessary JavaScript
+4. Ensure cross-browser compatibility
+5. Follow accessibility best practices
 
-2. **Visual Effects**:
-   - Use modern design patterns such as gradient overlays, glassmorphism for cards, and subtle background patterns.
-   - Include animated micro-interactions on hover and focus states.
-   - Implement skeleton loading states for lazy loading content.
-   - Add smooth scroll behavior for navigation and scrolling back to the top.
-   - Use high-quality images from Unsplash with appropriate attributions.
-   - Ensure responsive typography and layout for mobile and desktop views.
+Design Features:
+${isLanding ? `- Hero section with gradient background and CTA
+- Feature cards with hover effects
+- Testimonial slider/carousel
+- Animated statistics counter
+- FAQ accordion section
+- Newsletter subscription form
+- Smooth scroll navigation` : `- Interactive hover states
+- Loading animations
+- Form validation if applicable
+- Micro-interactions
+- Responsive layout
+- Error states handling`}
 
-3. **Responsiveness**:
-   - Implement mobile-first design principles. 
-   - Ensure that all elements stack correctly on mobile devices with appropriate spacing.
-   - Include a professional hamburger menu for mobile navigation.
-   - Add touch-friendly elements and ensure proper mobile interactions (e.g., large touch targets, responsive hover states).
+Technical Features:
+- Intersection Observer for scroll animations
+- CSS transitions for smooth effects
+- Local storage for user preferences
+- Form validation with error messages
+- Lazy loading for images
+- Touch-friendly mobile interactions
 
-4. **Tailwind CSS Features**:
-   - Utilize Tailwind's color palette and contrast utilities to maintain accessibility.
-   - Add dark mode support and implement a toggle switch for users to change themes.
-   - Leverage flexbox and grid layouts for responsive design.
-   - Use Tailwind's spacing, transition, and transform utilities to enhance user experience.
+Original request: ${prompt}
 
-5. **JavaScript Functionality**:
-   - Smooth scroll for in-page navigation (e.g., links to sections).
-   - Mobile menu toggle functionality for responsive navigation must be implemented and must be accessible.
-   - Dark mode toggle with persistent state (saved in localStorage) must be implemented and must be accessible.
-   - Intersection Observer for lazy loading images and animations.
-   - Add form validation for the contact form.
-   - Scroll-to-top button functionality.
-
-Return the code in this format:
-
+Return the code in the following format:
 \`\`\`html
-<!-- Include data attributes for JavaScript functionality -->
-<!-- Use Unsplash URLs for images -->
+<!-- HTML code here -->
 \`\`\`
 
 \`\`\`css
-/* Only include custom CSS if absolutely necessary */
+/* Additional CSS if needed */
 \`\`\`
 
 \`\`\`javascript
-// Include the initialization code above plus any additional functionality
-\`\`\`
-
-For the specific request: ${prompt}`;
+// JavaScript code here
+\`\`\``;
 
     const result = await model.generateContent(enhancedPrompt);
     const response = await result.response.text();
