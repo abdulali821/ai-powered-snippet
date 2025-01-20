@@ -2,7 +2,7 @@
 
 A modern web application that generates code snippets using AI technology. Built with Next.js 15, TypeScript, and TailwindCSS, this tool helps developers quickly generate vanilla HTML, CSS, and JavaScript code snippets based on natural language descriptions.
 
-![AI Code Generator](public/preview.png)
+![AI Code Generator](public/preview.jpeg)
 
 ## ✨ Features
 
@@ -84,6 +84,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-Your Name - [@yourusername](https://twitter.com/yourusername)
+Your Name - [@abdulali](https://linkedin.com/iamabdulali)
 
-Project Link: [https://github.com/yourusername/ai-powered-snippet](https://github.com/yourusername/ai-powered-snippet)
+Project Link: [https://github.com/abdulali821/ai-powered-snippet](https://github.com/abdulali821/ai-powered-snippet)
