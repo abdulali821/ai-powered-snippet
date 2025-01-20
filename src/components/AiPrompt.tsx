@@ -5,24 +5,15 @@ import CodeMirror from '@uiw/react-codemirror';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { javascript } from '@codemirror/lang-javascript';
 import { useTheme } from 'next-themes';
-import CodeLivePreview from './LivePreview';
-import ThemeToggle from './ThemeToggle';
-import { format } from 'date-fns';
+import LivePreview from './LivePreview';
+import LoadingSteps from './LoadingSteps';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiCopy, FiCode, FiEye, FiEdit2 } from 'react-icons/fi';
+import toast from 'react-hot-toast';
 
 interface CodeResponse {
   code: string;
   language: string;
-  similarPrompts?: Array<{
-    prompt: string;
-    createdAt: string;
-  }>;
-}
-
-interface HistoryItem {
-  id: string;
-  prompt: string;
-  response: string;
-  createdAt: string;
 }
 
 export default function AiPrompt() {
@@ -33,36 +24,31 @@ export default function AiPrompt() {
   const [loading, setLoading] = useState(false);
   const [editedCode, setEditedCode] = useState('');
   const [copied, setCopied] = useState(false);
-  const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [showHistory, setShowHistory] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
 
   useEffect(() => {
     setMounted(true);
-    fetchHistory();
   }, []);
 
-  // Update edited code when response changes
   useEffect(() => {
     if (response) {
       setEditedCode(response.code);
     }
   }, [response]);
 
-  const fetchHistory = async () => {
-    try {
-      const res = await fetch('/api/history');
-      if (res.ok) {
-        const data = await res.json();
-        setHistory(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch history:', error);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!prompt.trim()) return;
+
+    // Check for framework-specific keywords
+    const frameworkKeywords = ['react', 'vue', 'angular', 'svelte', 'component', 'jsx', 'tsx'];
+    const hasFrameworkKeywords = frameworkKeywords.some(keyword => 
+      prompt.toLowerCase().includes(keyword)
+    );
+
+    if (hasFrameworkKeywords) {
+      toast.error('This tool only generates vanilla HTML, CSS, and JavaScript code. Framework-specific code generation is not supported.');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -78,7 +64,6 @@ export default function AiPrompt() {
 
       const data = await res.json();
       setResponse(data);
-      await fetchHistory(); // Refresh history after new prompt
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -94,159 +79,120 @@ export default function AiPrompt() {
     }
   };
 
-  const handleHistoryClick = (item: HistoryItem) => {
-    setPrompt(item.prompt);
-    setResponse({
-      code: item.response,
-      language: 'html'
-    });
-    setShowHistory(false);
-  };
-
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8">
-      <div className="max-w-[90rem] mx-auto px-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
-                HTML/CSS/JavaScript Generator
-              </h1>
-              <button
-                onClick={() => setShowHistory(!showHistory)}
-                className="px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100 
-                         rounded-full hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
-              >
-                {showHistory ? 'Hide History' : 'Show History'}
-              </button>
-            </div>
-            <ThemeToggle />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div className={`space-y-6 ${showHistory ? 'lg:col-span-1' : 'lg:col-span-4'}`}>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label 
-                    htmlFor="prompt" 
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    What would you like me to create?
-                  </label>
-                  <textarea
-                    id="prompt"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="e.g., 'Create a responsive navigation menu' or 'Create a button with hover effect using Tailwind CSS'"
-                    className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 
-                             bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 
-                             focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                             min-h-[100px] resize-y"
-                  />
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6">
+      <div className="flex flex-col space-y-4">
+        <motion.form
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          onSubmit={(e) => e.preventDefault()}
+          className="w-full"
+        >
+          <div className="relative">
+            <motion.textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Describe the code you want to generate... (e.g., 'Create a responsive navigation bar with a logo and mobile menu')"
+              className="w-full p-4 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[120px] sm:min-h-[100px] resize-none text-sm sm:text-base"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            />
+            <motion.button
+              type="button"
+              onClick={handleSubmit}
+              disabled={loading || !prompt.trim()}
+              className={`absolute bottom-2 sm:bottom-4 right-2 sm:right-4 px-4 sm:px-6 py-1.5 sm:py-2 rounded-lg font-medium text-white text-sm sm:text-base
+                ${loading || !prompt.trim() 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'}
+                transition-colors duration-200`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {loading ? (
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span className="hidden sm:inline">Generating...</span>
+                  <span className="sm:hidden">Generating...</span>
                 </div>
-
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={loading || !prompt.trim()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 
-                             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                             disabled:opacity-50 disabled:cursor-not-allowed
-                             transition-colors duration-200"
-                  >
-                    {loading ? 'Generating...' : 'Generate Code'}
-                  </button>
-                </div>
-              </form>
-
-              {showHistory && (
-                <div className="space-y-4">
-                  <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-                    Previous Prompts
-                  </h2>
-                  <div className="space-y-2 max-h-[600px] overflow-y-auto">
-                    {history.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => handleHistoryClick(item)}
-                        className="w-full p-3 text-left bg-gray-50 dark:bg-gray-700 rounded-lg
-                                 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-                      >
-                        <p className="text-sm text-gray-900 dark:text-gray-100 line-clamp-2">
-                          {item.prompt}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          {format(new Date(item.createdAt), 'MMM d, yyyy HH:mm')}
-                        </p>
-                      </button>
-                    ))}
-                  </div>
+              ) : (
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <FiCode className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Generate</span>
+                  <span className="sm:hidden">Generate</span>
                 </div>
               )}
-            </div>
-
-            {response && (
-              <div className={`space-y-4 ${showHistory ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-                    Generated Code
-                  </h2>
-                  <button
-                    onClick={handleCopy}
-                    className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 
-                             hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md
-                             focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    {copied ? 'Copied!' : 'Copy Code'}
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-                  <div className="space-y-2">
-                    <div className="h-[400px] border rounded-lg overflow-hidden">
-                      <CodeMirror
-                        value={editedCode}
-                        height="400px"
-                        theme={theme === 'dark' ? vscodeDark : undefined}
-                        extensions={[javascript({ jsx: true })]}
-                        onChange={setEditedCode}
-                        style={{
-                          fontSize: '0.875rem',
-                          lineHeight: '1.25rem',
-                        }}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="h-[400px] border rounded-lg overflow-hidden bg-white dark:bg-gray-900">
-                    <CodeLivePreview code={editedCode} framework="html" />
-                  </div>
-                </div>
-
-                {response.similarPrompts && response.similarPrompts.length > 0 && (
-                  <div className="mt-4">
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Similar Previous Prompts
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {response.similarPrompts.map((item, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center px-3 py-1 rounded-full text-xs
-                                   bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100"
-                        >
-                          {item.prompt}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+            </motion.button>
           </div>
-        </div>
+        </motion.form>
+
+        <AnimatePresence>
+          {loading && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="w-full"
+            >
+              <LoadingSteps />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {response && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-4"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
+                <button
+                  onClick={() => setShowPreview(!showPreview)}
+                  className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  {showPreview ? (
+                    <>
+                      <FiEdit2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                      Show Editor
+                    </>
+                  ) : (
+                    <>
+                      <FiEye className="w-3 h-3 sm:w-4 sm:h-4" />
+                      Show Preview
+                    </>
+                  )}
+                </button>
+                <motion.button
+                  onClick={handleCopy}
+                  className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  <FiCopy className="w-3 h-3 sm:w-4 sm:h-4" />
+                  {copied ? 'Copied!' : 'Copy Code'}
+                </motion.button>
+              </div>
+
+              {showPreview ? (
+                <LivePreview code={editedCode} />
+              ) : (
+                <div className="relative w-full overflow-hidden rounded-lg">
+                  <CodeMirror
+                    value={editedCode}
+                    onChange={setEditedCode}
+                    theme={theme === 'dark' ? vscodeDark : 'light'}
+                    extensions={[javascript()]}
+                    className="text-sm sm:text-base"
+                  />
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
