@@ -62,8 +62,16 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
+    const apiKey = process.env.GOOGLE_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({
+        code: "API key is not configured. Please add your Google API key to the .env.local file.",
+        language: "text"
+      }, { status: 500 });
+    }
+
     const isLanding = isLandingPage(prompt);
-    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
+    const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
     const enhancedPrompt = `Generate clean, modern ${isLanding ? 'landing page' : 'component'} code using only vanilla HTML, CSS (with Tailwind classes), and JavaScript. 
