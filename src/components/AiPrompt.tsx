@@ -100,6 +100,14 @@ export default function AiPrompt() {
                 setPrompt(e.target.value);
                 setError(null);
               }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (prompt.trim() && !loading) {
+                    handleSubmit();
+                  }
+                }
+              }}
               placeholder="Describe the code you want to generate... (e.g., 'Create a responsive navigation bar with a logo and mobile menu')"
               className="w-full p-4 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[120px] sm:min-h-[100px] resize-none text-sm sm:text-base"
               initial={{ opacity: 0, y: 20 }}
