@@ -18,13 +18,13 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="fixed top-4 right-4 p-3 rounded-full bg-white dark:bg-gray-800 
+      className="p-3 rounded-full bg-white dark:bg-gray-800 
                 shadow-lg dark:shadow-gray-900/50 border border-gray-200 dark:border-gray-700
                 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700
                 transition-all duration-200 ease-in-out"
       aria-label="Toggle theme"
     >
-      {theme === 'dark' ? (
+      {mounted && theme === 'dark' ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
