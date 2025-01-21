@@ -1,20 +1,14 @@
-'use client';
-
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import { siteConfig } from "./config";
+import { Metadata } from 'next';
 
 const inter = Inter({ subsets: ["latin"] });
 
-async function generateMetadata() {
-  return {
-    title: siteConfig.title,
-    description: siteConfig.description,
-  };
-}
-
-export { generateMetadata as metadata };
+export const metadata: Metadata = {
+  title: "AI Powered Snippet Generator",
+  description: "Generate beautiful UI components with AI",
+};
 
 export default function RootLayout({
   children,
