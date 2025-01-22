@@ -74,7 +74,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Open Source License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -84,6 +84,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-Your Name - [@abdulali](https://linkedin.com/iamabdulali)
+LinkedIn - [@iamabdulali](https://linkedin.com/iamabdulali)
 
-Project Link: [https://github.com/abdulali821/ai-powered-snippet](https://github.com/abdulali821/ai-powered-snippet)
+Email : [iamabdulali1@gmail.com](mailto:iamabdulali1@gmail.com?subject=Contact%20from%20Website&body=Hi%20there!%20I%20have%20a%20question%20about%20your%20project.)
